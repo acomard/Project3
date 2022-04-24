@@ -94,6 +94,7 @@ int main(int argc, char* argv[]){
     while(getline(edgeStream, edgeStr)){
         bool fromInRange = false;
         bool toInRange = false;
+        int toIndex, fromIndex;
         istringstream parseEdge(edgeStr);
         parseEdge >> from;
         parseEdge >> to;
@@ -101,23 +102,63 @@ int main(int argc, char* argv[]){
         for(int i = 0; i < range; i++){
             if(V[i] == from){
                 fromInRange = true;
+                fromIndex = i;
             }
             if(V[i] == to){
                 toInRange = true;
+                toIndex = i;
             }
         }
         if(fromInRange && toInRange){
-            E[count].start = from;
-            E[count].end = to;
+            E[count].start = fromIndex;
+            E[count].end = toIndex;
             count++;
         }
     }
 
-    for(int i = 0; i < edgeCount; i++){
-        cout << E[i].start;
-        cout << " ";
-        cout << E[i].end;
-        cout << "\n";
+    //construct the graph
+    Graph G(E, edgeCount, range);
+
+    string command;
+    while(getline(commandStream, command)){
+        //cout << command;
+        if(command == "out-degree"){
+            //echo the command
+            cout << "Command: out-degree\n\n";
+
+            double average = double(edgeCount)/double(range);
+
+            cout << "The graph G has average out-degree " + to_string(edgeCount) + "/" + to_string(range) + " = " + to_string(average) + "\n";
+            cout << "The out-degree distribution is:\n";
+            cout << "\tOut-degree : Number of vertices\n";
+
+            int longestDegree = getLongestDegree(G, range);
+            int degrees[longestDegree+1] = {0};
+            for(int i = 0; i < range; i++){
+                int count = 0;
+                adjNode* ptr = G.head[i];
+                while(ptr != nullptr){
+                    count++;
+                    ptr = ptr->next;
+                }
+                degrees[count]++;
+            }
+            for(int n = 0; n <= longestDegree; n++){
+                cout << "\t";
+                cout << n;
+                cout << " : ";
+                cout << degrees[n];
+                cout << "\n";
+            }
+        }
+    }
+
+    
+
+    //cout << longestDegree;
+
+    for(int i = 0; i < range; i++){
+        //displayAdjacencyList(G.head[i], i);
     }
 
     //testing

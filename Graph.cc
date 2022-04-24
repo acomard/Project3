@@ -9,6 +9,7 @@ struct adjNode{
 struct graphEdge{
     int start, end;
 };
+
 class Graph{
     //insert a new node to adjacency list
     adjNode* insertListNode(int ind, adjNode* head){
@@ -44,8 +45,36 @@ public:
     }
     ~Graph(){
         for(int i = 0; i < V; i++){
-            delete[] head[i];
-            delete[] head;
+            //delete[] head[i];
+            //delete[] head;
         }
     }
 };
+
+int getLongestDegree(Graph G, int range){
+    int longest = 0;
+    for(int i = 0; i < range; i++){
+        int count = 0;
+        adjNode* ptr = G.head[i];
+        while(ptr != nullptr){
+            count++;
+            ptr = ptr->next;
+        }
+        if(count > longest){
+            longest = count;
+        }
+    }
+    return longest;
+}
+/*
+void displayAdjacencyList(adjNode* ptr, int vertex){
+    cout << vertex;
+    cout << ": ";
+    while(ptr != nullptr){
+        cout << ptr->index;
+        cout << "->";
+        ptr = ptr->next;
+    }
+    cout << "\n";
+}
+*/
