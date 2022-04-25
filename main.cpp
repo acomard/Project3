@@ -4,6 +4,7 @@
 #include <sstream>
 #include "utility.cc"
 #include "Graph.cc"
+#include <limits>
 
 using namespace std;
 
@@ -36,6 +37,7 @@ int main(int argc, char* argv[]){
 
     //get the range
     range = getVertexCount(dateFile, startYear, endYear);
+    
 
     //print the number of vertices
     cout << "|V| = " + to_string(range) + " vertices\n";
@@ -43,6 +45,7 @@ int main(int argc, char* argv[]){
     //initialize the array of vertex labels for the range
     int V[range];
 
+    
     //process the vertices from the file data
     ifstream vertexStream(dateFile, ios::in);
     string line, labelStr, dateStr;
@@ -71,6 +74,7 @@ int main(int argc, char* argv[]){
         V[index] = vertexLabel;
         index++;
     }
+    
     //sort the array of vertex labels
     insertionSort(V, range);
 
@@ -79,10 +83,11 @@ int main(int argc, char* argv[]){
 
     //print the number of edges    
     cout << "|E| = " + to_string(edgeCount) + " edges\n\n";
-
+    
     //initialize the array of edge pairs
     graphEdge E[edgeCount];
 
+    
     //construct the edge pair graph
     ifstream edgeStream(edgeFile, ios::in);
     string edgeStr;
@@ -115,10 +120,10 @@ int main(int argc, char* argv[]){
             count++;
         }
     }
-
+    
     //construct the graph
     Graph G(E, edgeCount, range);
-
+    
     string command;
     while(getline(commandStream, command)){
         //cout << command;
@@ -150,6 +155,62 @@ int main(int argc, char* argv[]){
                 cout << degrees[n];
                 cout << "\n";
             }
+            cout << "\n";
+        }
+        if(command == "diameter"){
+            //echo the command
+            cout << "Command: diameter\n\n";
+
+            //setup the adjacency matrix
+            int adjacencyMatrix[range][range];
+            for(int i = 0; i < range; i++){
+                for(int j = 0; j < range; j++){
+                    adjacencyMatrix[i][j] = std::numeric_limits<int>::max();
+                }
+                adjNode* ptr = G.head[i];
+                while(ptr != nullptr){
+                    adjacencyMatrix[i][ptr->index] = 1;
+                    ptr = ptr->next;
+                }
+                adjacencyMatrix[i][i] = 0;
+            }
+            //setup complete
+
+            int dist[range][range], l, m, n;
+
+            for(l = 0; l < range; l++){
+                for(m = 0; m < range; m++){
+                    dist[l][m] = adjacencyMatrix[l][m];
+                }
+            }
+            for(n = 0; n < range; n++){
+                for(l = 0; l < range; l++){
+                    for(m = 0; m < range; m++){
+                        if(dist[l][m] > (dist[l][n] + dist[n][m]) &&(dist[n][m] != std::numeric_limits<int>::max() && dist[l][n] != std::numeric_limits<int>::max())){
+                            dist[l][m] = dist[l][n] + dist[n][m];
+                        }
+                    }
+                }
+            }
+            //end of floyd warshall
+
+            //find the longest shortest path
+            int longest = 0;
+            for (int r = 0; r < range; r++){
+                for(int c = 0; c < range; c++){
+                    if(dist[r][c] > longest && (dist[r][c] != std::numeric_limits<int>::max())){
+                        longest = dist[r][c];
+                    }
+                }
+            }
+            //print the resulting diameter = longest
+            cout << "The graph G has diameter ";
+            cout << longest;
+            cout << ".\n\n";
+        }
+        if(command == "scc"){
+            //echo the command
+            cout << "Command: scc\n\n";
         }
     }
 
@@ -163,11 +224,12 @@ int main(int argc, char* argv[]){
 
     //testing
     //cout << vertexLabel;
-    cout << "\n";
+    //cout << "\n";
     //cout << date;
-    cout << edgeCount;
+    //cout << edgeCount;
     //cout << endYear;
 
     //set up an array of vertices where each index is a "vertex label", sort the array, then build an array of edges with the pairs being the indexes that correspod to the vertex label
     //arrays should only have the edges/vertices in the range startYear to endYear
+    
 }
